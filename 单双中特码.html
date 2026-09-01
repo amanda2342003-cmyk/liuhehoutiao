@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特码单双</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .win-animal {
+            color: #FF0000;
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}&_=${Date.now()}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}&_=${Date.now()}`;
+
+    let duLieuMapB = {};
+    let duLieuMapE = {};
+
+    const DAN = ["01", "03", "05", "07", "09", "11", "13", "15", "17", "19", "21", "23", "25", "27", "29", "31", "33", "35", "37", "39", "41", "43", "45", "47", "49"];
+    const SHUANG = ["02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48"];
+
+    const STATIC_PREDICTIONS = {
+        1: "单", 2: "双", 3: "双", 4: "单", 5: "单", 6: "双", 7: "双", 8: "单", 9: "单", 10: "双",
+        11: "双", 12: "单", 13: "双", 14: "双", 15: "单", 16: "单", 17: "双", 18: "单", 19: "单", 20: "双",
+        21: "单", 22: "双", 23: "单", 24: "双", 25: "单", 26: "单", 27: "双", 28: "单", 29: "双", 30: "单",
+        31: "单", 32: "双", 33: "双", 34: "单", 35: "双", 36: "双", 37: "单", 38: "单", 39: "双", 40: "单",
+        41: "单", 42: "双", 43: "双", 44: "单", 45: "单", 46: "双", 47: "双", 48: "单", 49: "双", 50: "单",
+        51: "双", 52: "单", 53: "单", 54: "双", 55: "单", 56: "单", 57: "双", 58: "双", 59: "单", 60: "双",
+        61: "双", 62: "单", 63: "单", 64: "双", 65: "单", 66: "单", 67: "双", 68: "双", 69: "单", 70: "双",
+        71: "单", 72: "单", 73: "双", 74: "单", 75: "双", 76: "双", 77: "单", 78: "双", 79: "双", 80: "单",
+        81: "双", 82: "单", 83: "双", 84: "单", 85: "双", 86: "双", 87: "单", 88: "双", 89: "双", 90: "单",
+        91: "双", 92: "单", 93: "双", 94: "双", 95: "单", 96: "双", 97: "单", 98: "双", 99: "单", 100: "双",
+        101: "单", 102: "单", 103: "双", 104: "双", 105: "单", 106: "单", 107: "双", 108: "双", 109: "单", 110: "单",
+        111: "双", 112: "双", 113: "单", 114: "双", 115: "双", 116: "单", 117: "单", 118: "双", 119: "双", 120: "单",
+        121: "单", 122: "双", 123: "单", 124: "单", 125: "双", 126: "单", 127: "单", 128: "双", 129: "双", 130: "单",
+        131: "双", 132: "双", 133: "单", 134: "单", 135: "双", 136: "单", 137: "单", 138: "双", 139: "单", 140: "双",
+        141: "双", 142: "单", 143: "双", 144: "双", 145: "单", 146: "双", 147: "单", 148: "双", 149: "单", 150: "单",
+        151: "双", 152: "单", 153: "双", 154: "单", 155: "双", 156: "双", 157: "单", 158: "双", 159: "双", 160: "单",
+        161: "双", 162: "单", 163: "单", 164: "双", 165: "双", 166: "单", 167: "单", 168: "双", 169: "双", 170: "单",
+        171: "双", 172: "双", 173: "单", 174: "双", 175: "单", 176: "双", 177: "双", 178: "单", 179: "双", 180: "双",
+        181: "单", 182: "双", 183: "双", 184: "单", 185: "双", 186: "单", 187: "双", 188: "双", 189: "单", 190: "单",
+        191: "双", 192: "单", 193: "单", 194: "双", 195: "双", 196: "单", 197: "双", 198: "单", 199: "单", 200: "双",
+        201: "单", 202: "双", 203: "单", 204: "单", 205: "双", 206: "双", 207: "单", 208: "单", 209: "双", 210: "单",
+        211: "双", 212: "双", 213: "单", 214: "双", 215: "单", 216: "单", 217: "双", 218: "单", 219: "双", 220: "单",
+        221: "单", 222: "双", 223: "单", 224: "单", 225: "双", 226: "双", 227: "单", 228: "单", 229: "双", 230: "单",
+        231: "双", 232: "双", 233: "单", 234: "单", 235: "双", 236: "双", 237: "单", 238: "双", 239: "双", 240: "单",
+        241: "单", 242: "双", 243: "双", 244: "单", 245: "单", 246: "双", 247: "双", 248: "单", 249: "双", 250: "单",
+        251: "双", 252: "单", 253: "双", 254: "单", 255: "双", 256: "双", 257: "单", 258: "单", 259: "双", 260: "双",
+        261: "单", 262: "双", 263: "单", 264: "双", 265: "双", 266: "单", 267: "双", 268: "双", 269: "单", 270: "单",
+        271: "双", 272: "双", 273: "单", 274: "双", 275: "单", 276: "单", 277: "双", 278: "单", 279: "双", 280: "双",
+        281: "单", 282: "双", 283: "双", 284: "单", 285: "单", 286: "双", 287: "单", 288: "双", 289: "单", 290: "双",
+        291: "双", 292: "单", 293: "双", 294: "单", 295: "双", 296: "单", 297: "双", 298: "单", 299: "单", 300: "双",
+        301: "单", 302: "单", 303: "双", 304: "双", 305: "单", 306: "单", 307: "双", 308: "单", 309: "单", 310: "双",
+        311: "单", 312: "单", 313: "双", 314: "单", 315: "双", 316: "双", 317: "单", 318: "单", 319: "双", 320: "单",
+        321: "单", 322: "双", 323: "双", 324: "单", 325: "单", 326: "双", 327: "单", 328: "单", 329: "双", 330: "双",
+        331: "单", 332: "单", 333: "双", 334: "单", 335: "单", 336: "双", 337: "双", 338: "单", 339: "双", 340: "双",
+        341: "单", 342: "单", 343: "双", 344: "单", 345: "单", 346: "双", 347: "双", 348: "单", 349: "单", 350: "双",
+        351: "单", 352: "双", 353: "双", 354: "单", 355: "单", 356: "双", 357: "双", 358: "单", 359: "双", 360: "双",
+        361: "单", 362: "双", 363: "单", 364: "双", 365: "单", 366: "双"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error(" ");
+            });
+    }
+
+    function getPredictDanShuangForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        if (STATIC_PREDICTIONS[actualKy]) {
+            return STATIC_PREDICTIONS[actualKy];
+        }
+        let cycle = Math.floor((actualKy - 1) / 2);
+        return cycle % 2 === 0 ? "双" : "单";
+    }
+
+    function getDanShuangByNum(numStr) {
+        if (DAN.includes(numStr)) return "单";
+        if (SHUANG.includes(numStr)) return "双";
+        return "";
+    }
+
+    function formatTwoDigits(val) {
+        let cleanVal = String(val).trim();
+        let num = parseInt(cleanVal.replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    function formatThreeDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '001';
+        return String(num).padStart(3, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalB = (r.c[1] && r.c[1].v !== null && r.c[1].v !== undefined) ? String(r.c[1].v).trim() : '';
+                        let animalE = (r.c[4] && r.c[4].v !== null && r.c[4].v !== undefined) ? String(r.c[4].v).trim() : '';
+                        
+                        if (formattedNum) {
+                            if (animalB) duLieuMapB[formattedNum] = animalB;
+                            if (animalE) duLieuMapE[formattedNum] = animalE;
+                        }
+                    }
+                });
+            }
+
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rows = rawKQ.table.rows;
+            let parsedList = [];
+            let lastXRowIndex = -1;
+
+            if (rows) {
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i].c;
+                    if (!r) continue;
+
+                    let isXRow = false;
+                    for (let colIdx = 1; colIdx <= 7; colIdx++) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            if (String(r[colIdx].v).trim().toLowerCase() === 'x') {
+                                isXRow = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isXRow) {
+                        lastXRowIndex = i;
+                        continue;
+                    }
+
+                    if (!r[0] || r[0].v === null || r[0].v === undefined) continue;
+
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let numTeFormatted = '';
+                    if (r[7] && r[7].v !== null && r[7].v !== undefined) {
+                        let valStr = String(r[7].v).trim();
+                        if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                            numTeFormatted = formatTwoDigits(valStr);
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            rowIndex: i,
+                            kyNum: kyOnlyNum,
+                            numTe: numTeFormatted
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.numTe !== '' && item.numTe !== '00';
+                if (isDone) {
+                    item.useMapE = (lastXRowIndex !== -1 && item.rowIndex > lastXRowIndex);
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let winEntries = [];
+            let consecutiveLosses = 0;
+
+            for (let i = doneList.length - 1; i >= 0; i--) {
+                let item = doneList[i];
+                let predicted = getPredictDanShuangForKy(item.kyNum);
+                let actual = getDanShuangByNum(item.numTe);
+                let isValidNum = (DAN.includes(item.numTe) || SHUANG.includes(item.numTe));
+                let isWin = isValidNum && actual && (predicted === actual);
+                
+                if (isWin) {
+                    consecutiveLosses = 0;
+                    winEntries.push({ item, predicted, actual });
+                    // Lấy tối đa 14 kỳ trúng
+                    if (winEntries.length === 14) {
+                        break;
+                    }
+                } else {
+                    consecutiveLosses++;
+                    // Dừng khi gặp 3 kỳ sai liên tiếp
+                    if (consecutiveLosses >= 3) {
+                        break;
+                    }
+                }
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictDanShuangForKy(nextKyNum);
+            let kyStrNext = formatThreeDigits(nextKyNum);
+
+            let htmlNextKy = `<p style="font-family:'Microsoft YaHei',微软雅黑,sans-serif;font-size:18px;">${kyStrNext}期:特码单双——<span style="color:#0000FF;">【</span><span style="color:#FF0000;">${predictNext}</span><span style="color:#0000FF;">】</span>开:？00准</p>`;
+
+            let historyOutputs = [];
+
+            for (let i = 0; i < winEntries.length; i++) {
+                let entry = winEntries[i];
+                let activeMap = entry.item.useMapE ? duLieuMapE : duLieuMapB;
+                let shengXiaoWin = activeMap[entry.item.numTe] || duLieuMapB[entry.item.numTe] || '';
+                
+                let resStrWin = shengXiaoWin + entry.item.numTe + '准';
+                let kyStr = formatThreeDigits(entry.item.kyNum);
+                let formattedPredictHtml = `<span style="color:#FF0000; background-color:yellow;">${entry.predicted}</span>`;
+                historyOutputs.push(`<p style="font-family:'Microsoft YaHei',微软雅黑,sans-serif;font-size:18px;">${kyStr}期:特码单双——<span style="color:#0000FF;">【</span>${formattedPredictHtml}<span style="color:#0000FF;">】</span>开:${resStrWin}</p>`);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = formatThreeDigits(nextKyNum + 1);
+                let kyStr2 = formatThreeDigits(nextKyNum + 2);
+                let defaultHtml1 = `<p style="font-family:'Microsoft YaHei',微软雅黑,sans-serif;font-size:18px;">${kyStr1}期:特码单双——<span style="color:#0000FF;">【</span><span style="color:#FF0000;">發</span><span style="color:#0000FF;">】</span>开:？00准</p>`;
+                let defaultHtml2 = `<p style="font-family:'Microsoft YaHei',微软雅黑,sans-serif;font-size:18px;">${kyStr2}期:特码单双——<span style="color:#0000FF;">【</span><span style="color:#FF0000;">發</span><span style="color:#0000FF;">】</span>开:？00准</p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = formatThreeDigits(nextKyNum + 1);
+                let defaultHtmlExtra = `<p style="font-family:'Microsoft YaHei',微软雅黑,sans-serif;font-size:18px;">${kyStrExtra}期:特码单双——<span style="color:#0000FF;">【</span><span style="color:#FF0000;">發</span><span style="color:#0000FF;">】</span>开:？00准</p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = ' ';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>

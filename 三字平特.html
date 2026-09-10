@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三字平特</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .win-idiom {
+            color: #FF0000;
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}&_=${Date.now()}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}&_=${Date.now()}`;
+
+    let duLieuMap = {};
+
+    // Danh sách 366 kỳ dự đoán thành ngữ cố định
+    const STATIC_PREDICTIONS = {
+        1: "变色龙", 2: "哮天犬", 3: "萌呆猪", 4: "落汤鸡", 5: "喜羊羊", 6: "白蛇精", 7: "笑面虎", 8: "跑龙套", 9: "猪八戒", 10: "千里马",
+        11: "铁公鸡", 12: "小黑猴", 13: "贺兔头", 14: "小肥羊", 15: "地头蛇", 16: "萌呆猪", 17: "执牛耳", 18: "窜天鼠", 19: "兔三窟", 20: "哮天犬",
+        21: "跑龙套", 22: "萌萌猪", 23: "黄飞猴", 24: "笑面虎", 25: "替罪羊", 26: "落汤鸡", 27: "响尾蛇", 28: "下马威", 29: "一牛鸣", 30: "双兔碑",
+        31: "小黑猴", 32: "地头蛇", 33: "变色龙", 34: "钻地鼠", 35: "笑面虎", 36: "看门狗", 37: "薄荷猴", 38: "露马脚", 39: "跑龙套", 40: "落汤鸡",
+        41: "孺子牛", 42: "哮天犬", 43: "萌呆猪", 44: "小黑猴", 45: "变色龙", 46: "小肥羊", 47: "千里马", 48: "地头蛇", 49: "钻地鼠", 50: "铁公鸡",
+        51: "悠嘻猴", 52: "跑龙套", 53: "白蛇精", 54: "青蟾兔", 55: "萌萌猪", 56: "落汤鸡", 57: "喜羊羊", 58: "窜天鼠", 59: "母老虎", 60: "响尾蛇",
+        61: "千里马", 62: "铁公鸡", 63: "执牛耳", 64: "笑面虎", 65: "打地鼠", 66: "薄荷猴", 67: "看门狗", 68: "下马威", 69: "替罪羊", 70: "钻地鼠",
+        71: "落汤鸡", 72: "老黄牛", 73: "哮天犬", 74: "母老虎", 75: "三兔穴", 76: "猪自清", 77: "乖乖猴", 78: "铁公鸡", 79: "打地鼠", 80: "捋虎须",
+        81: "变色龙", 82: "哮天犬", 83: "萌呆猪", 84: "落汤鸡", 85: "喜羊羊", 86: "白蛇精", 87: "笑面虎", 88: "跑龙套", 89: "猪八戒", 90: "千里马",
+        91: "铁公鸡", 92: "小黑猴", 93: "贺兔头", 94: "小肥羊", 95: "地头蛇", 96: "萌呆猪", 97: "执牛耳", 98: "窜天鼠", 99: "兔三窟", 100: "哮天犬",
+        101: "跑龙套", 102: "萌萌猪", 103: "黄飞猴", 104: "笑面虎", 105: "替罪羊", 106: "落汤鸡", 107: "响尾蛇", 108: "下马威", 109: "一牛鸣", 110: "双兔碑",
+        111: "小黑猴", 112: "地头蛇", 113: "变色龙", 114: "钻地鼠", 115: "笑面虎", 116: "看门狗", 117: "薄荷猴", 118: "露马脚", 119: "跑龙套", 120: "落汤鸡",
+        121: "孺子牛", 122: "哮天犬", 123: "萌呆猪", 124: "小黑猴", 125: "变色龙", 126: "小肥羊", 127: "千里马", 128: "地头蛇", 129: "钻地鼠", 130: "铁公鸡",
+        131: "悠嘻猴", 132: "跑龙套", 133: "白蛇精", 134: "青蟾兔", 135: "萌萌猪", 136: "落汤鸡", 137: "喜羊羊", 138: "窜天鼠", 139: "母老虎", 140: "响尾蛇",
+        141: "千里马", 142: "铁公鸡", 143: "执牛耳", 144: "笑面虎", 145: "打地鼠", 146: "薄荷猴", 147: "看门狗", 148: "下马威", 149: "替罪羊", 150: "钻地鼠",
+        151: "落汤鸡", 152: "老黄牛", 153: "哮天犬", 154: "母老虎", 155: "三兔穴", 156: "猪自清", 157: "乖乖猴", 158: "铁公鸡", 159: "打地鼠", 160: "捋虎须",
+        161: "变色龙", 162: "哮天犬", 163: "萌呆猪", 164: "落汤鸡", 165: "喜羊羊", 166: "白蛇精", 167: "笑面虎", 168: "跑龙套", 169: "猪八戒", 170: "千里马",
+        171: "铁公鸡", 172: "小黑猴", 173: "贺兔头", 174: "小肥羊", 175: "地头蛇", 176: "萌呆猪", 177: "执牛耳", 178: "窜天鼠", 179: "兔三窟", 180: "哮天犬",
+        181: "跑龙套", 182: "萌萌猪", 183: "黄飞猴", 184: "笑面虎", 185: "替罪羊", 186: "落汤鸡", 187: "响尾蛇", 188: "下马威", 189: "一牛鸣", 190: "双兔碑",
+        191: "小黑猴", 192: "地头蛇", 193: "变色龙", 194: "钻地鼠", 195: "笑面虎", 196: "看门狗", 197: "薄荷猴", 198: "露马脚", 199: "跑龙套", 200: "落汤鸡",
+        201: "孺子牛", 202: "哮天犬", 203: "萌呆猪", 204: "小黑猴", 205: "变色龙", 206: "小肥羊", 207: "千里马", 208: "地头蛇", 209: "钻地鼠", 210: "铁公鸡",
+        211: "悠嘻猴", 212: "跑龙套", 213: "白蛇精", 214: "青蟾兔", 215: "萌萌猪", 216: "落汤鸡", 217: "喜羊羊", 218: "窜天鼠", 219: "母老虎", 220: "响尾蛇",
+        221: "千里马", 222: "铁公鸡", 223: "执牛耳", 224: "笑面虎", 225: "打地鼠", 226: "薄荷猴", 227: "看门狗", 228: "下马威", 229: "替罪羊", 230: "钻地鼠",
+        231: "落汤鸡", 232: "老黄牛", 233: "哮天犬", 234: "母老虎", 235: "三兔穴", 236: "猪自清", 237: "乖乖猴", 238: "铁公鸡", 239: "打地鼠", 240: "捋虎须",
+        241: "变色龙", 242: "哮天犬", 243: "萌呆猪", 244: "落汤鸡", 245: "喜羊羊", 246: "白蛇精", 247: "笑面虎", 248: "跑龙套", 249: "猪八戒", 250: "千里马",
+        251: "铁公鸡", 252: "小黑猴", 253: "贺兔头", 254: "小肥羊", 255: "地头蛇", 256: "萌呆猪", 257: "执牛耳", 258: "窜天鼠", 259: "兔三窟", 260: "哮天犬",
+        261: "跑龙套", 262: "萌萌猪", 263: "黄飞猴", 264: "笑面虎", 265: "替罪羊", 266: "落汤鸡", 267: "响尾蛇", 268: "下马威", 269: "一牛鸣", 270: "双兔碑",
+        271: "小黑猴", 272: "地头蛇", 273: "变色龙", 274: "钻地鼠", 275: "笑面虎", 276: "看门狗", 277: "薄荷猴", 278: "露马脚", 279: "跑龙套", 280: "落汤鸡",
+        281: "孺子牛", 282: "哮天犬", 283: "萌呆猪", 284: "小黑猴", 285: "变色龙", 286: "小肥羊", 287: "千里马", 288: "地头蛇", 289: "钻地鼠", 290: "铁公鸡",
+        291: "悠嘻猴", 292: "跑龙套", 293: "白蛇精", 294: "青蟾兔", 295: "萌萌猪", 296: "落汤鸡", 297: "喜羊羊", 298: "窜天鼠", 299: "母老虎", 300: "响尾蛇",
+        301: "千里马", 302: "铁公鸡", 303: "执牛耳", 304: "笑面虎", 305: "打地鼠", 306: "薄荷猴", 307: "看门狗", 308: "下马威", 309: "替罪羊", 310: "钻地鼠",
+        311: "落汤鸡", 312: "老黄牛", 313: "哮天犬", 314: "母老虎", 315: "三兔穴", 316: "猪自清", 317: "乖乖猴", 318: "铁公鸡", 319: "打地鼠", 320: "捋虎须",
+        321: "变色龙", 322: "哮天犬", 323: "萌呆猪", 324: "落汤鸡", 325: "喜羊羊", 326: "白蛇精", 327: "笑面虎", 328: "跑龙套", 329: "猪八戒", 330: "千里马",
+        331: "铁公鸡", 332: "小黑猴", 333: "贺兔头", 334: "小肥羊", 335: "地头蛇", 336: "萌呆猪", 337: "执牛耳", 338: "窜天鼠", 339: "兔三窟", 340: "哮天犬",
+        341: "跑龙套", 342: "萌萌猪", 343: "黄飞猴", 344: "笑面虎", 345: "替罪羊", 346: "落汤鸡", 347: "响尾蛇", 348: "下马威", 349: "一牛鸣", 350: "双兔碑",
+        351: "小黑猴", 352: "地头蛇", 353: "变色龙", 354: "钻地鼠", 355: "笑面虎", 356: "看门狗", 357: "薄荷猴", 358: "露马脚", 359: "跑龙套", 360: "落汤鸡",
+        361: "孺子牛", 362: "哮天犬", 363: "萌呆猪", 364: "小黑猴", 365: "变色龙", 366: "小肥羊"
+    };
+
+    // Bảng tra cứu con giáp tương ứng cho từng câu thành ngữ
+    const IDIOM_ANIMAL_MAP = {
+        "窜天鼠": "鼠", "米老鼠": "鼠", "钻地鼠": "鼠", "打地鼠": "鼠",
+        "执牛耳": "牛", "一牛鸣": "牛", "老黄牛": "牛", "孺子牛": "牛",
+        "笑面虎": "虎", "捋虎须": "虎", "母老虎": "虎",
+        "小白兔": "兔", "兔崽子": "兔", "贺兔头": "兔", "兔三窟": "兔", "三兔穴": "兔", "白兔公": "兔", "白兔记": "兔", "兔园册": "兔", "兔毛衫": "兔", "双兔碑": "兔", "青蟾兔": "兔",
+        "跑龙套": "龙", "变色龙": "龙",
+        "白蛇精": "蛇", "响尾蛇": "蛇", "地头蛇": "蛇",
+        "铁公鸡": "鸡", "落汤鸡": "鸡",
+        "替罪羊": "羊", "小肥羊": "羊", "喜羊羊": "羊",
+        "哮天犬": "狗", "看门狗": "狗",
+        "猪八戒": "猪", "笨笨猪": "猪", "萌呆猪": "猪", "萌萌猪": "猪", "猪自清": "猪",
+        "孙猴子": "猴", "悠嘻猴": "猴", "比基猴": "猴", "乖乖猴": "猴", "小黑猴": "猴", "黄飞猴": "猴", "奥巴猴": "猴", "薄荷猴": "猴",
+        "马前卒": "马", "马后炮": "马", "下马威": "马", "露马脚": "马", "千里马": "马"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error("Không thể đọc dữ liệu");
+            });
+    }
+
+    function getPredictForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        return STATIC_PREDICTIONS[actualKy] || "变色龙";
+    }
+
+    function formatTwoDigits(val) {
+        let cleanVal = String(val).trim();
+        let num = parseInt(cleanVal.replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    function formatThreeDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '001';
+        return String(num).padStart(3, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rowsKQ = rawKQ.table ? rawKQ.table.rows : [];
+
+            let hasX = false;
+            if (rowsKQ) {
+                for (let r of rowsKQ) {
+                    if (r.c) {
+                        for (let cell of r.c) {
+                            if (cell && cell.v !== null && cell.v !== undefined) {
+                                if (String(cell.v).toLowerCase().includes('x')) {
+                                    hasX = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (hasX) break;
+                }
+            }
+
+            let animalColIndex = hasX ? 4 : 1;
+
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalCell = r.c[animalColIndex];
+                        let animal = (animalCell && animalCell.v !== null && animalCell.v !== undefined) ? String(animalCell.v).trim() : '';
+                        if (formattedNum && animal) {
+                            duLieuMap[formattedNum] = animal;
+                        }
+                    }
+                });
+            }
+
+            let parsedList = [];
+            if (rowsKQ) {
+                for (let i = 0; i < rowsKQ.length; i++) {
+                    const r = rowsKQ[i].c;
+                    if (!r || !r[0] || r[0].v === null || r[0].v === undefined) continue;
+                    
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let orderedColumns = [7, 1, 2, 3, 4, 5, 6];
+                    let numbersInDraw = [];
+
+                    for (let colIdx of orderedColumns) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            let valStr = String(r[colIdx].v).trim();
+                            if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                                let formatted = formatTwoDigits(valStr);
+                                if (formatted) {
+                                    numbersInDraw.push(formatted);
+                                }
+                            }
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            kyNum: kyOnlyNum,
+                            drawNumbers: numbersInDraw
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.drawNumbers && item.drawNumbers.length > 0;
+                if (isDone) {
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let evaluatedDoneList = [];
+            for (let i = 0; i < doneList.length; i++) {
+                let item = doneList[i];
+                let predictedIdiom = getPredictForKy(item.kyNum);
+                let targetAnimal = IDIOM_ANIMAL_MAP[predictedIdiom] || "";
+                
+                let isWin = false;
+                let winNumber = "";
+                let winAnimal = "";
+
+                for (let numStr of item.drawNumbers) {
+                    let numInt = parseInt(numStr, 10);
+                    if (numInt >= 1 && numInt <= 49) {
+                        let mappedAnimal = duLieuMap[numStr] || '';
+                        if (mappedAnimal === targetAnimal) {
+                            isWin = true;
+                            winNumber = numStr;
+                            winAnimal = mappedAnimal;
+                            break;
+                        }
+                    }
+                }
+                
+                evaluatedDoneList.push({ item, isWin, predictedIdiom, winNumber, winAnimal });
+            }
+
+            let checkLatestMisses = 0;
+            for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                if (!evaluatedDoneList[i].isWin) {
+                    checkLatestMisses++;
+                } else {
+                    break;
+                }
+            }
+
+            let cutoffIndex = 0;
+            if (checkLatestMisses < 3) {
+                let consecutiveMisses = 0;
+                for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                    if (!evaluatedDoneList[i].isWin) {
+                        consecutiveMisses++;
+                        if (consecutiveMisses >= 3) {
+                            cutoffIndex = i + 1;
+                            break;
+                        }
+                    } else {
+                        consecutiveMisses = 0;
+                    }
+                }
+            } else {
+                cutoffIndex = evaluatedDoneList.length;
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictForKy(nextKyNum);
+            let kyStrNext = formatThreeDigits(nextKyNum);
+
+            let htmlNextKy = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:#008080;">${kyStrNext}期:（谁入一件）</span><span style="color:#008000;">→三字平特→</span><span style="color:#FF0000;">（${predictNext}）</span><span style="color:#008080;">开：</span><span style="color:#808000;">？00准</span></p>`;
+
+            let historyOutputs = [];
+            if (checkLatestMisses < 3) {
+                for (let i = cutoffIndex; i < evaluatedDoneList.length; i++) {
+                    let evalItem = evaluatedDoneList[i];
+                    let item = evalItem.item;
+
+                    if (evalItem.isWin) {
+                        let predictedIdiom = evalItem.predictedIdiom;
+                        let kyStr = formatThreeDigits(item.kyNum);
+
+                        let formattedPredict = `<span style="color:#FF0000;">（</span><span class="win-idiom">${predictedIdiom}</span><span style="color:#FF0000;">）</span>`;
+                        
+                        // Hiển thị đầy đủ Số trúng + Tên con giáp (ví dụ: 43狗)
+                        let winText = `${evalItem.winNumber}${evalItem.winAnimal}`;
+                        
+                        historyOutputs.push(`<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:#008080;">${kyStr}期:（谁入一件）</span><span style="color:#008000;">→三字平特→</span>${formattedPredict}<span style="color:#008080;">开：</span><span style="color:#808000;">${winText}准</span></p>`);
+                    }
+                }
+            }
+
+            historyOutputs.reverse();
+
+            if (historyOutputs.length > 14) {
+                historyOutputs = historyOutputs.slice(0, 14);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = formatThreeDigits(nextKyNum + 1);
+                let kyStr2 = formatThreeDigits(nextKyNum + 2);
+                let defaultHtml1 = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:#008080;">${kyStr1}期:（谁入一件）</span><span style="color:#008000;">→三字平特→</span><span style="color:#FF0000;">（發發發）</span><span style="color:#008080;">开：</span><span style="color:#808000;">？00准</span></p>`;
+                let defaultHtml2 = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:#008080;">${kyStr2}期:（谁入一件）</span><span style="color:#008000;">→三字平特→</span><span style="color:#FF0000;">（發發發）</span><span style="color:#008080;">开：</span><span style="color:#808000;">？00准</span></p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = formatThreeDigits(nextKyNum + 1);
+                let defaultHtmlExtra = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:#008080;">${kyStrExtra}期:（谁入一件）</span><span style="color:#008000;">→三字平特→</span><span style="color:#FF0000;">（發發發）</span><span style="color:#008080;">开：</span><span style="color:#808000;">？00准</span></p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = '';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳门六合彩【绝杀一尾】精准猛料！</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}`;
+
+    let duLieuMapB = {};
+    let duLieuMapE = {};
+
+    const STATIC_PREDICTIONS = {
+        1: "1尾", 2: "7尾", 3: "5尾", 4: "6尾", 5: "8尾", 6: "2尾", 7: "0尾", 8: "1尾", 9: "7尾", 10: "4尾",
+        11: "6尾", 12: "5尾", 13: "8尾", 14: "7尾", 15: "0尾", 16: "4尾", 17: "1尾", 18: "5尾", 19: "3尾", 20: "8尾",
+        21: "2尾", 22: "1尾", 23: "9尾", 24: "7尾", 25: "6尾", 26: "2尾", 27: "1尾", 28: "8尾", 29: "3尾", 30: "0尾",
+        31: "5尾", 32: "4尾", 33: "7尾", 34: "2尾", 35: "0尾", 36: "8尾", 37: "4尾", 38: "1尾", 39: "3尾", 40: "0尾",
+        41: "5尾", 42: "2尾", 43: "6尾", 44: "4尾", 45: "9尾", 46: "1尾", 47: "8尾", 48: "3尾", 49: "0尾", 50: "4尾",
+        51: "9尾", 52: "1尾", 53: "5尾", 54: "0尾", 55: "8尾", 56: "3尾", 57: "1尾", 58: "4尾", 59: "2尾", 60: "7尾",
+        61: "0尾", 62: "9尾", 63: "1尾", 64: "6尾", 65: "3尾", 66: "2尾", 67: "9尾", 68: "4尾", 69: "7尾", 70: "3尾",
+        71: "6尾", 72: "8尾", 73: "0尾", 74: "4尾", 75: "5尾", 76: "2尾", 77: "1尾", 78: "8尾", 79: "6尾", 80: "3尾",
+        81: "9尾", 82: "0尾", 83: "5尾", 84: "6尾", 85: "2尾", 86: "3尾", 87: "0尾", 88: "9尾", 89: "1尾", 90: "6尾",
+        91: "4尾", 92: "3尾", 93: "8尾", 94: "9尾", 95: "6尾", 96: "7尾", 97: "4尾", 98: "0尾", 99: "5尾", 100: "3尾",
+        101: "8尾", 102: "9尾", 103: "4尾", 104: "6尾", 105: "7尾", 106: "0尾", 107: "1尾", 108: "5尾", 109: "4尾", 110: "8尾",
+        111: "3尾", 112: "6尾", 113: "0尾", 114: "9尾", 115: "4尾", 116: "1尾", 117: "7尾", 118: "0尾", 119: "5尾", 120: "8尾",
+        121: "1尾", 122: "3尾", 123: "4尾", 124: "9尾", 125: "6尾", 126: "0尾", 127: "3尾", 128: "2尾", 129: "8尾", 130: "4尾",
+        131: "6尾", 132: "7尾", 133: "2尾", 134: "0尾", 135: "4尾", 136: "1尾", 137: "9尾", 138: "2尾", 139: "5尾", 140: "4尾",
+        141: "6尾", 142: "8尾", 143: "7尾", 144: "5尾", 145: "4尾", 146: "3尾", 147: "6尾", 148: "1尾", 149: "8尾", 150: "0尾",
+        151: "2尾", 152: "6尾", 153: "3尾", 154: "4尾", 155: "0尾", 156: "8尾", 157: "7尾", 158: "1尾", 159: "9尾", 160: "4尾",
+        161: "3尾", 162: "2尾", 163: "7尾", 164: "6尾", 165: "1尾", 166: "5尾", 167: "8尾", 168: "7尾", 169: "4尾", 170: "3尾",
+        171: "9尾", 172: "6尾", 173: "8尾", 174: "1尾", 175: "5尾", 176: "3尾", 177: "6尾", 178: "9尾", 179: "8尾", 180: "2尾",
+        181: "4尾", 182: "1尾", 183: "3尾", 184: "5尾", 185: "6尾", 186: "4尾", 187: "1尾", 188: "3尾", 189: "5尾", 190: "6尾",
+        191: "4尾", 192: "2尾", 193: "3尾", 194: "1尾", 195: "0尾", 196: "6尾", 197: "9尾", 198: "8尾", 199: "7尾", 200: "4尾",
+        201: "9尾", 202: "8尾", 203: "7尾", 204: "4尾", 205: "3尾", 206: "1尾", 207: "2尾", 208: "8尾", 209: "4尾", 210: "5尾",
+        211: "1尾", 212: "2尾", 213: "8尾", 214: "3尾", 215: "6尾", 216: "5尾", 217: "9尾", 218: "7尾", 219: "2尾", 220: "0尾",
+        221: "4尾", 222: "8尾", 223: "1尾", 224: "5尾", 225: "7尾", 226: "4尾", 227: "2尾", 228: "1尾", 229: "6尾", 230: "7尾",
+        231: "4尾", 232: "0尾", 233: "3尾", 234: "8尾", 235: "9尾", 236: "4尾", 237: "1尾", 238: "3尾", 239: "6尾", 240: "2尾",
+        241: "0尾", 242: "8尾", 243: "3尾", 244: "7尾", 245: "6尾", 246: "1尾", 247: "4尾", 248: "8尾", 249: "2尾", 250: "5尾",
+        251: "7尾", 252: "1尾", 253: "4尾", 254: "3尾", 255: "9尾", 256: "0尾", 257: "2尾", 258: "6尾", 259: "5尾", 260: "7尾",
+        261: "1尾", 262: "3尾", 263: "8尾", 264: "4尾", 265: "2尾", 266: "7尾", 267: "5尾", 268: "0尾", 269: "6尾", 270: "8尾",
+        271: "9尾", 272: "5尾", 273: "3尾", 274: "6尾", 275: "7尾", 276: "1尾", 277: "0尾", 278: "9尾", 279: "3尾", 280: "4尾",
+        281: "8尾", 282: "7尾", 283: "2尾", 284: "1尾", 285: "6尾", 286: "4尾", 287: "9尾", 288: "7尾", 289: "5尾", 290: "2尾",
+        291: "4尾", 292: "0尾", 293: "3尾", 294: "1尾", 295: "9尾", 296: "6尾", 297: "8尾", 298: "7尾", 299: "3尾", 300: "0尾",
+        301: "1尾", 302: "8尾", 303: "7尾", 304: "9尾", 305: "6尾", 306: "2尾", 307: "3尾", 308: "4尾", 309: "8尾", 310: "9尾",
+        311: "0尾", 312: "5尾", 313: "2尾", 314: "3尾", 315: "9尾", 316: "8尾", 317: "6尾", 318: "5尾", 319: "0尾", 320: "7尾",
+        321: "2尾", 322: "9尾", 323: "6尾", 324: "8尾", 325: "4尾", 326: "3尾", 327: "9尾", 328: "5尾", 329: "7尾", 330: "4尾",
+        331: "1尾", 332: "2尾", 333: "5尾", 334: "7尾", 335: "9尾", 336: "0尾", 337: "6尾", 338: "1尾", 339: "2尾", 340: "9尾",
+        341: "5尾", 342: "8尾", 343: "0尾", 344: "4尾", 345: "7尾", 346: "5尾", 347: "1尾", 348: "6尾", 349: "4尾", 350: "7尾",
+        351: "5尾", 352: "1尾", 353: "2尾", 354: "0尾", 355: "8尾", 356: "4尾", 357: "1尾", 358: "2尾", 359: "6尾", 360: "7尾",
+        361: "4尾", 362: "1尾", 363: "5尾", 364: "2尾", 365: "8尾", 366: "7尾"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error(" ");
+            });
+    }
+
+    function getPredictForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        return STATIC_PREDICTIONS[actualKy] || "0尾";
+    }
+
+    function formatTwoDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalB = (r.c[1] && r.c[1].v !== null && r.c[1].v !== undefined) ? String(r.c[1].v).trim() : '';
+                        let animalE = (r.c[4] && r.c[4].v !== null && r.c[4].v !== undefined) ? String(r.c[4].v).trim() : '';
+                        
+                        if (formattedNum) {
+                            if (animalB) duLieuMapB[formattedNum] = animalB;
+                            if (animalE) duLieuMapE[formattedNum] = animalE;
+                        }
+                    }
+                });
+            }
+
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rows = rawKQ.table.rows;
+            let parsedList = [];
+            let lastXRowIndex = -1;
+
+            if (rows) {
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i].c;
+                    if (!r) continue;
+
+                    let isXRow = false;
+                    for (let colIdx = 1; colIdx <= 7; colIdx++) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            if (String(r[colIdx].v).trim().toLowerCase() === 'x') {
+                                isXRow = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isXRow) {
+                        lastXRowIndex = i;
+                        continue;
+                    }
+
+                    if (!r[0] || r[0].v === null || r[0].v === undefined) continue;
+
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let numTeFormatted = '';
+                    if (r[7] && r[7].v !== null && r[7].v !== undefined) {
+                        let valStr = String(r[7].v).trim();
+                        if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                            numTeFormatted = formatTwoDigits(r[7].v);
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            rowIndex: i,
+                            kyNum: kyOnlyNum,
+                            numTe: numTeFormatted
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.numTe !== '';
+                if (isDone) {
+                    item.useMapE = (lastXRowIndex !== -1 && item.rowIndex > lastXRowIndex);
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let evaluatedDoneList = [];
+            for (let i = 0; i < doneList.length; i++) {
+                let item = doneList[i];
+                let predicted = getPredictForKy(item.kyNum);
+                
+                let targetMap = item.useMapE ? duLieuMapE : duLieuMapB;
+                let actualAnimal = targetMap[item.numTe] || '';
+                
+                let numVal = parseInt(item.numTe, 10);
+                let isValidNum = !isNaN(numVal) && numVal >= 1 && numVal <= 49;
+                
+                let actualWei = isValidNum ? (item.numTe.slice(-1) + "尾") : '';
+                
+                let isWin = isValidNum && actualAnimal && (actualWei !== predicted);
+
+                evaluatedDoneList.push({ item, isWin, actualAnimal });
+            }
+
+            let checkLatestDeletes = 0;
+            for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                if (!evaluatedDoneList[i].isWin) {
+                    checkLatestDeletes++;
+                } else {
+                    break;
+                }
+            }
+
+            let cutoffIndex = 0;
+            if (checkLatestDeletes >= 3) {
+                cutoffIndex = evaluatedDoneList.length;
+            } else {
+                let consecutiveDeletes = 0;
+                for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                    if (!evaluatedDoneList[i].isWin) {
+                        consecutiveDeletes++;
+                        if (consecutiveDeletes >= 3) {
+                            cutoffIndex = i + 1;
+                            break;
+                        }
+                    } else {
+                        consecutiveDeletes = 0;
+                    }
+                }
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictForKy(nextKyNum);
+            let kyStrNext = String(nextKyNum).padStart(3, '0');
+
+            let htmlNextKy = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrNext}期绝杀一尾→【<span style="color:#FF0000;">${predictNext}</span>】开:<span style="color: #FF0000">？00</span>√</p>`;
+
+            let historyOutputs = [];
+            if (checkLatestDeletes < 3) {
+                for (let i = cutoffIndex; i < doneList.length; i++) {
+                    let item = doneList[i];
+                    let evaluated = evaluatedDoneList.find(e => e.item.kyNum === item.kyNum);
+                    if (evaluated && evaluated.isWin) {
+                        let predicted = getPredictForKy(item.kyNum);
+                        let shengXiaoWin = evaluated.actualAnimal || '';
+                        let resStrWin = shengXiaoWin + item.numTe;
+                        let kyStr = String(item.kyNum).padStart(3, '0');
+                        historyOutputs.push(`<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr}期绝杀一尾→【<span style="color:#FF0000;">${predicted}</span>】开:<span style="color: #FF0000">${resStrWin}</span>√</p>`);
+                    }
+                }
+            }
+            historyOutputs.reverse();
+
+            if (historyOutputs.length > 14) {
+                historyOutputs = historyOutputs.slice(0, 14);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = String(nextKyNum + 1).padStart(3, '0');
+                let kyStr2 = String(nextKyNum + 2).padStart(3, '0');
+                let defaultHtml1 = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr1}期绝杀一尾→【<span style="color:#FF0000;">$尾</span>】开:<span style="color: #FF0000">？00</span>√</p>`;
+                let defaultHtml2 = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr2}期绝杀一尾→【<span style="color:#FF0000;">$尾</span>】开:<span style="color: #FF0000">？00</span>√</p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = String(nextKyNum + 1).padStart(3, '0');
+                let defaultHtmlExtra = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrExtra}期绝杀一尾→【<span style="color:#FF0000;">$尾</span>】开:<span style="color: #FF0000">？00</span>√</p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = '';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>

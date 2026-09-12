@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳门六合彩【不出半波】精准猛料！</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}`;
+
+    let duLieuMapB = {};
+    let duLieuMapE = {};
+
+    const COLOR_MAP = {
+        "红双": ["02", "08", "12", "18", "24", "30", "34", "40", "46"],
+        "红单": ["01", "07", "13", "19", "23", "29", "35", "45"],
+        "蓝双": ["04", "10", "14", "20", "26", "36", "42", "48"],
+        "蓝单": ["03", "09", "15", "25", "31", "37", "41", "47"],
+        "绿双": ["06", "16", "22", "28", "32", "38", "44"],
+        "绿单": ["05", "11", "17", "21", "27", "33", "39", "43", "49"]
+    };
+
+    const STATIC_PREDICTIONS = {
+        1: "绿单", 2: "红双", 3: "绿双", 4: "蓝双", 5: "红双", 6: "绿双", 7: "蓝单", 8: "蓝双", 9: "红单", 10: "绿双",
+        11: "红双", 12: "蓝双", 13: "蓝单", 14: "红双", 15: "红单", 16: "蓝双", 17: "绿单", 18: "红双", 19: "蓝双", 20: "绿双",
+        21: "蓝单", 22: "红双", 23: "蓝双", 24: "绿双", 25: "红单", 26: "蓝单", 27: "绿双", 28: "红单", 29: "红双", 30: "绿双",
+        31: "蓝单", 32: "红双", 33: "蓝双", 34: "红单", 35: "蓝单", 36: "绿单", 37: "红双", 38: "绿双", 39: "蓝双", 40: "红双",
+        41: "绿双", 42: "蓝双", 43: "蓝单", 44: "绿双", 45: "红双", 46: "绿单", 47: "蓝单", 48: "绿双", 49: "蓝双", 50: "红单",
+        51: "蓝单", 52: "蓝双", 53: "绿单", 54: "蓝单", 55: "绿双", 56: "红单", 57: "蓝单", 58: "绿双", 59: "绿单", 60: "红单",
+        61: "红双", 62: "绿单", 63: "绿双", 64: "红双", 65: "蓝双", 66: "绿单", 67: "红双", 68: "蓝单", 69: "蓝双", 70: "绿双",
+        71: "红双", 72: "红单", 73: "蓝双", 74: "蓝单", 75: "绿双", 76: "红单", 77: "蓝双", 78: "蓝单", 79: "绿单", 80: "红双",
+        81: "蓝双", 82: "蓝单", 83: "绿单", 84: "绿双", 85: "红单", 86: "蓝单", 87: "绿单", 88: "蓝双", 89: "红双", 90: "绿双",
+        91: "绿单", 92: "蓝单", 93: "绿双", 94: "红双", 95: "绿单", 96: "绿双", 97: "红双", 98: "红单", 99: "蓝双", 100: "绿双",
+        101: "蓝单", 102: "红单", 103: "绿双", 104: "绿单", 105: "红双", 106: "红单", 107: "蓝单", 108: "绿单", 109: "红单", 110: "蓝双",
+        111: "绿单", 112: "绿双", 113: "蓝单", 114: "绿单", 115: "绿双", 116: "红双", 117: "绿单", 118: "绿双", 119: "蓝双", 120: "红单",
+        121: "绿单", 122: "绿双", 123: "蓝单", 124: "红双", 125: "绿双", 126: "蓝双", 127: "红单", 128: "绿双", 129: "红双", 130: "红单",
+        131: "绿单", 132: "绿双", 133: "红双", 134: "蓝双", 135: "绿双", 136: "红双", 137: "蓝双", 138: "绿双", 139: "绿单", 140: "红单",
+        141: "红双", 142: "蓝双", 143: "绿单", 144: "红双", 145: "绿双", 146: "蓝双", 147: "红双", 148: "绿双", 149: "蓝单", 150: "蓝双",
+        151: "红单", 152: "绿双", 153: "红双", 154: "蓝双", 155: "蓝单", 156: "红双", 157: "红单", 158: "蓝双", 159: "绿单", 160: "红双",
+        161: "蓝双", 162: "绿双", 163: "蓝单", 164: "红双", 165: "蓝双", 166: "绿双", 167: "红单", 168: "蓝单", 169: "绿双", 170: "红单",
+        171: "红双", 172: "绿双", 173: "蓝单", 174: "红双", 175: "蓝双", 176: "红单", 177: "蓝单", 178: "绿单", 179: "红双", 180: "绿双",
+        181: "蓝双", 182: "红双", 183: "绿双", 184: "蓝双", 185: "蓝单", 186: "绿双", 187: "红双", 188: "绿单", 189: "蓝单", 190: "绿双",
+        191: "蓝双", 192: "红单", 193: "蓝单", 194: "蓝双", 195: "绿单", 196: "蓝单", 197: "绿双", 198: "红单", 199: "蓝单", 200: "绿双",
+        201: "绿单", 202: "红单", 203: "红双", 204: "绿单", 205: "绿双", 206: "红双", 207: "蓝双", 208: "绿单", 209: "红双", 210: "蓝单",
+        211: "蓝双", 212: "绿双", 213: "红双", 214: "红单", 215: "蓝双", 216: "蓝单", 217: "绿双", 218: "红单", 219: "蓝双", 220: "蓝单",
+        221: "绿单", 222: "红双", 223: "蓝双", 224: "蓝单", 225: "绿单", 226: "绿双", 227: "红单", 228: "蓝单", 229: "绿单", 230: "蓝双",
+        231: "红双", 232: "绿双", 233: "绿单", 234: "蓝单", 235: "绿双", 236: "红双", 237: "绿单", 238: "绿双", 239: "红双", 240: "红单",
+        241: "蓝双", 242: "绿双", 243: "蓝单", 244: "红单", 245: "绿双", 246: "绿单", 247: "红双", 248: "红单", 249: "蓝单", 250: "绿单",
+        251: "红单", 252: "蓝双", 253: "绿单", 254: "绿双", 255: "蓝单", 256: "绿单", 257: "绿双", 258: "红双", 259: "绿单", 260: "绿双",
+        261: "蓝双", 262: "红单", 263: "绿单", 264: "绿双", 265: "蓝单", 266: "红双", 267: "绿双", 268: "蓝双", 269: "红单", 270: "绿双",
+        271: "红双", 272: "红单", 273: "绿单", 274: "绿双", 275: "红双", 276: "蓝双", 277: "绿双", 278: "红双", 279: "蓝双", 280: "绿双",
+        281: "绿单", 282: "红单", 283: "红双", 284: "蓝双", 285: "绿单", 286: "红双", 287: "绿双", 288: "蓝双", 289: "红双", 290: "绿双",
+        291: "蓝单", 292: "蓝双", 293: "红单", 294: "绿双", 295: "红双", 296: "蓝双", 297: "蓝单", 298: "红双", 299: "红单", 300: "蓝双",
+        301: "绿单", 302: "红双", 303: "蓝双", 304: "绿双", 305: "蓝单", 306: "红双", 307: "蓝双", 308: "绿双", 309: "红单", 310: "蓝单",
+        311: "绿双", 312: "红单", 313: "红双", 314: "绿双", 315: "蓝单", 316: "红双", 317: "蓝双", 318: "红单", 319: "蓝单", 320: "绿单",
+        321: "红双", 322: "绿双", 323: "蓝双", 324: "红双", 325: "绿双", 326: "蓝双", 327: "蓝单", 328: "绿双", 329: "红双", 330: "绿单",
+        331: "蓝单", 332: "绿双", 333: "蓝双", 334: "红单", 335: "蓝单", 336: "蓝双", 337: "绿单", 338: "蓝单", 339: "绿双", 340: "红单",
+        341: "蓝单", 342: "绿双", 343: "绿单", 344: "红单", 345: "红双", 346: "绿单", 347: "绿双", 348: "红双", 349: "蓝双", 350: "绿单",
+        351: "红双", 352: "蓝单", 353: "蓝双", 354: "绿双", 355: "红双", 356: "红单", 357: "蓝双", 358: "蓝单", 359: "绿双", 360: "红单",
+        361: "蓝双", 362: "蓝单", 363: "绿单", 364: "红双", 365: "蓝双", 366: "蓝单"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error(" ");
+            });
+    }
+
+    function getPredictBoForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        return STATIC_PREDICTIONS[actualKy] || "蓝双";
+    }
+
+    function formatTwoDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalB = (r.c[1] && r.c[1].v !== null && r.c[1].v !== undefined) ? String(r.c[1].v).trim() : '';
+                        let animalE = (r.c[4] && r.c[4].v !== null && r.c[4].v !== undefined) ? String(r.c[4].v).trim() : '';
+                        
+                        if (formattedNum) {
+                            if (animalB) duLieuMapB[formattedNum] = animalB;
+                            if (animalE) duLieuMapE[formattedNum] = animalE;
+                        }
+                    }
+                });
+            }
+
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rows = rawKQ.table.rows;
+            let parsedList = [];
+            let lastXRowIndex = -1;
+
+            if (rows) {
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i].c;
+                    if (!r) continue;
+
+                    let isXRow = false;
+                    for (let colIdx = 1; colIdx <= 7; colIdx++) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            if (String(r[colIdx].v).trim().toLowerCase() === 'x') {
+                                isXRow = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isXRow) {
+                        lastXRowIndex = i;
+                        continue;
+                    }
+
+                    if (!r[0] || r[0].v === null || r[0].v === undefined) continue;
+
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let numTeFormatted = '';
+                    if (r[7] && r[7].v !== null && r[7].v !== undefined) {
+                        let valStr = String(r[7].v).trim();
+                        if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                            numTeFormatted = formatTwoDigits(r[7].v);
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            rowIndex: i,
+                            kyNum: kyOnlyNum,
+                            numTe: numTeFormatted
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.numTe !== '';
+                if (isDone) {
+                    item.useMapE = (lastXRowIndex !== -1 && item.rowIndex > lastXRowIndex);
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let evaluatedDoneList = [];
+            for (let i = 0; i < doneList.length; i++) {
+                let item = doneList[i];
+                let predictedBo = getPredictBoForKy(item.kyNum);
+                
+                let targetMap = item.useMapE ? duLieuMapE : duLieuMapB;
+                let actualAnimal = targetMap[item.numTe] || '';
+                
+                let numVal = parseInt(item.numTe, 10);
+                let isValidRange = (!isNaN(numVal) && numVal >= 1 && numVal <= 49);
+                
+                let killNumbers = COLOR_MAP[predictedBo] || [];
+                let isWin = isValidRange && (!killNumbers.includes(item.numTe));
+
+                evaluatedDoneList.push({ item, isWin, actualAnimal });
+            }
+
+            let checkLatestDeletes = 0;
+            for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                if (!evaluatedDoneList[i].isWin) {
+                    checkLatestDeletes++;
+                } else {
+                    break;
+                }
+            }
+
+            let cutoffIndex = 0;
+            if (checkLatestDeletes >= 3) {
+                cutoffIndex = evaluatedDoneList.length;
+            } else {
+                let consecutiveDeletes = 0;
+                for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                    if (!evaluatedDoneList[i].isWin) {
+                        consecutiveDeletes++;
+                        if (consecutiveDeletes >= 3) {
+                            cutoffIndex = i + 1;
+                            break;
+                        }
+                    } else {
+                        consecutiveDeletes = 0;
+                    }
+                }
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictBoForKy(nextKyNum);
+            let kyStrNext = String(nextKyNum).padStart(3, '0');
+
+            let htmlNextKy = `<p style="font-size:16px;font-weight:bold;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrNext}期:不出半波→<span style="color:#FF0000;">${predictNext}</span>←开:<span style="color:#FF0000;">？00</span>准</p>`;
+
+            let historyOutputs = [];
+            if (checkLatestDeletes < 3) {
+                for (let i = cutoffIndex; i < doneList.length; i++) {
+                    let item = doneList[i];
+                    let evaluated = evaluatedDoneList.find(e => e.item.kyNum === item.kyNum);
+                    if (evaluated && evaluated.isWin) {
+                        let predicted = getPredictBoForKy(item.kyNum);
+                        let shengXiaoWin = evaluated.actualAnimal || '';
+                        let resStrWin = shengXiaoWin + item.numTe;
+                        let kyStr = String(item.kyNum).padStart(3, '0');
+                        historyOutputs.push(`<p style="font-size:16px;font-weight:bold;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr}期:不出半波→<span style="color:#FF0000;">${predicted}</span>←开:<span style="color:#FF0000;">${resStrWin}</span>准</p>`);
+                    }
+                }
+            }
+            historyOutputs.reverse();
+
+            if (historyOutputs.length > 14) {
+                historyOutputs = historyOutputs.slice(0, 14);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = String(nextKyNum + 1).padStart(3, '0');
+                let kyStr2 = String(nextKyNum + 2).padStart(3, '0');
+                let defaultHtml1 = `<p style="font-size:16px;font-weight:bold;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr1}期:不出半波→<span style="color:#FF0000;">發發</span>←开:<span style="color:#FF0000;">？00</span>准</p>`;
+                let defaultHtml2 = `<p style="font-size:16px;font-weight:bold;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr2}期:不出半波→<span style="color:#FF0000;">發發</span>←开:<span style="color:#FF0000;">？00</span>准</p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = String(nextKyNum + 1).padStart(3, '0');
+                let defaultHtmlExtra = `<p style="font-size:16px;font-weight:bold;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrExtra}期:不出半波→<span style="color:#FF0000;">發發</span>←开:<span style="color:#FF0000;">？00</span>准</p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = ' ';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>

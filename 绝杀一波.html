@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳门六合彩【绝杀一波】精准猛料！</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}`;
+
+    let duLieuMapB = {};
+    let duLieuMapE = {};
+
+    const COLOR_MAP = {
+        "红波红波": ["01", "02", "07", "08", "12", "13", "18", "19", "23", "24", "29", "30", "34", "35", "40", "45", "46"],
+        "蓝波蓝波": ["03", "04", "09", "10", "14", "15", "20", "25", "26", "31", "36", "37", "41", "42", "47", "48"],
+        "绿波绿波": ["05", "06", "11", "16", "17", "21", "22", "27", "28", "32", "33", "38", "39", "43", "44", "49"]
+    };
+
+    const STATIC_PREDICTIONS = {
+        1: "绿波绿波", 2: "蓝波蓝波", 3: "绿波绿波", 4: "红波红波", 5: "蓝波蓝波", 6: "红波红波", 7: "蓝波蓝波", 8: "绿波绿波", 9: "蓝波蓝波", 10: "绿波绿波",
+        11: "红波红波", 12: "蓝波蓝波", 13: "绿波绿波", 14: "红波红波", 15: "蓝波蓝波", 16: "红波红波", 17: "蓝波蓝波", 18: "绿波绿波", 19: "红波红波", 20: "蓝波蓝波",
+        21: "绿波绿波", 22: "蓝波蓝波", 23: "红波红波", 24: "绿波绿波", 25: "红波红波", 26: "绿波绿波", 27: "蓝波蓝波", 28: "红波红波", 29: "蓝波蓝波", 30: "红波红波",
+        31: "绿波绿波", 32: "蓝波蓝波", 33: "红波红波", 34: "蓝波蓝波", 35: "绿波绿波", 36: "红波红波", 37: "蓝波蓝波", 38: "红波红波", 39: "绿波绿波", 40: "红波红波",
+        41: "蓝波蓝波", 42: "绿波绿波", 43: "红波红波", 44: "绿波绿波", 45: "蓝波蓝波", 46: "绿波绿波", 47: "蓝波蓝波", 48: "绿波绿波", 49: "红波红波", 50: "蓝波蓝波",
+        51: "红波红波", 52: "绿波绿波", 53: "蓝波蓝波", 54: "绿波绿波", 55: "蓝波蓝波", 56: "红波红波", 57: "蓝波蓝波", 58: "红波红波", 59: "蓝波蓝波", 60: "绿波绿波",
+        61: "红波红波", 62: "绿波绿波", 63: "红波红波", 64: "绿波绿波", 65: "红波红波", 66: "绿波绿波", 67: "红波红波", 68: "蓝波蓝波", 69: "绿波绿波", 70: "红波红波",
+        71: "绿波绿波", 72: "蓝波蓝波", 73: "绿波绿波", 74: "红波红波", 75: "蓝波蓝波", 76: "绿波绿波", 77: "红波红波", 78: "绿波绿波", 79: "蓝波蓝波", 80: "红波红波",
+        81: "绿波绿波", 82: "红波红波", 83: "蓝波蓝波", 84: "红波红波", 85: "蓝波蓝波", 86: "绿波绿波", 87: "红波红波", 88: "蓝波蓝波", 89: "红波红波", 90: "绿波绿波",
+        91: "红波红波", 92: "绿波绿波", 93: "红波红波", 94: "蓝波蓝波", 95: "绿波绿波", 96: "红波红波", 97: "绿波绿波", 98: "红波红波", 99: "绿波绿波", 100: "蓝波蓝波",
+        101: "红波红波", 102: "绿波绿波", 103: "蓝波蓝波", 104: "红波红波", 105: "绿波绿波", 106: "红波红波", 107: "绿波绿波", 108: "蓝波蓝波", 109: "绿波绿波", 110: "蓝波蓝波",
+        111: "红波红波", 112: "蓝波蓝波", 113: "绿波绿波", 114: "红波红波", 115: "绿波绿波", 116: "蓝波蓝波", 117: "红波红波", 118: "蓝波蓝波", 119: "绿波绿波", 120: "蓝波蓝波",
+        121: "红波红波", 122: "绿波绿波", 123: "蓝波蓝波", 124: "绿波绿波", 125: "蓝波蓝波", 126: "绿波绿波", 127: "蓝波蓝波", 128: "红波红波", 129: "蓝波蓝波", 130: "红波红波",
+        131: "蓝波蓝波", 132: "红波红波", 133: "蓝波蓝波", 134: "红波红波", 135: "绿波绿波", 136: "蓝波蓝波", 137: "红波红波", 138: "绿波绿波", 139: "蓝波蓝波", 140: "绿波绿波",
+        141: "蓝波蓝波", 142: "绿波绿波", 143: "红波红波", 144: "绿波绿波", 145: "蓝波蓝波", 146: "绿波绿波", 147: "红波红波", 148: "蓝波蓝波", 149: "红波红波", 150: "蓝波蓝波",
+        151: "红波红波", 152: "蓝波蓝波", 153: "红波红波", 154: "蓝波蓝波", 155: "红波红波", 156: "蓝波蓝波", 157: "红波红波", 158: "绿波绿波", 159: "蓝波蓝波", 160: "红波红波",
+        161: "蓝波蓝波", 162: "绿波绿波", 163: "红波红波", 164: "绿波绿波", 165: "蓝波蓝波", 166: "绿波绿波", 167: "蓝波蓝波", 168: "绿波绿波", 169: "蓝波蓝波", 170: "绿波绿波",
+        171: "红波红波", 172: "绿波绿波", 173: "红波红波", 174: "蓝波蓝波", 175: "绿波绿波", 176: "蓝波蓝波", 177: "绿波绿波", 178: "红波红波", 179: "绿波绿波", 180: "蓝波蓝波",
+        181: "红波红波", 182: "绿波绿波", 183: "绿波绿波", 184: "蓝波蓝波", 185: "绿波绿波", 186: "红波红波", 187: "蓝波蓝波", 188: "红波红波", 189: "蓝波蓝波", 190: "绿波绿波",
+        191: "蓝波蓝波", 192: "绿波绿波", 193: "红波红波", 194: "蓝波蓝波", 195: "绿波绿波", 196: "红波红波", 197: "蓝波蓝波", 198: "红波红波", 199: "蓝波蓝波", 200: "绿波绿波",
+        201: "红波红波", 202: "蓝波蓝波", 203: "绿波绿波", 204: "蓝波蓝波", 205: "红波红波", 206: "绿波绿波", 207: "红波红波", 208: "绿波绿波", 209: "蓝波蓝波", 210: "红波红波",
+        211: "蓝波蓝波", 212: "红波红波", 213: "绿波绿波", 214: "蓝波蓝波", 215: "红波红波", 216: "蓝波蓝波", 217: "绿波绿波", 218: "红波红波", 219: "蓝波蓝波", 220: "红波红波",
+        221: "绿波绿波", 222: "红波红波", 223: "蓝波蓝波", 224: "绿波绿波", 225: "红波红波", 226: "绿波绿波", 227: "蓝波蓝波", 228: "绿波绿波", 229: "蓝波蓝波", 230: "绿波绿波",
+        231: "红波红波", 232: "蓝波蓝波", 233: "红波红波", 234: "绿波绿波", 235: "蓝波蓝波", 236: "绿波绿波", 237: "蓝波蓝波", 238: "红波红波", 239: "蓝波蓝波", 240: "红波红波",
+        241: "蓝波蓝波", 242: "绿波绿波", 243: "红波红波", 244: "绿波绿波", 245: "红波红波", 246: "绿波绿波", 247: "红波红波", 248: "绿波绿波", 249: "红波红波", 250: "蓝波蓝波",
+        251: "绿波绿波", 252: "红波红波", 253: "绿波绿波", 254: "蓝波蓝波", 255: "绿波绿波", 256: "红波红波", 257: "蓝波蓝波", 258: "绿波绿波", 259: "红波红波", 260: "绿波绿波",
+        261: "蓝波蓝波", 262: "红波红波", 263: "绿波绿波", 264: "红波红波", 265: "蓝波蓝波", 266: "红波红波", 267: "蓝波蓝波", 268: "绿波绿波", 269: "红波红波", 270: "蓝波蓝波",
+        271: "红波红波", 272: "绿波绿波", 273: "红波红波", 274: "绿波绿波", 275: "红波红波", 276: "蓝波蓝波", 277: "绿波绿波", 278: "红波红波", 279: "绿波绿波", 280: "红波红波",
+        281: "绿波绿波", 282: "蓝波蓝波", 283: "红波红波", 284: "绿波绿波", 285: "蓝波蓝波", 286: "红波红波", 287: "绿波绿波", 288: "红波红波", 289: "绿波绿波", 290: "蓝波蓝波",
+        291: "绿波绿波", 292: "蓝波蓝波", 293: "红波红波", 294: "蓝波蓝波", 295: "绿波绿波", 296: "红波红波", 297: "绿波绿波", 298: "蓝波蓝波", 299: "红波红波", 300: "蓝波蓝波",
+        301: "绿波绿波", 302: "蓝波蓝波", 303: "红波红波", 304: "绿波绿波", 305: "蓝波蓝波", 306: "绿波绿波", 307: "蓝波蓝波", 308: "绿波绿波", 309: "蓝波蓝波", 310: "红波红波",
+        311: "蓝波蓝波", 312: "红波红波", 313: "蓝波蓝波", 314: "红波红波", 315: "蓝波蓝波", 316: "红波红波", 317: "绿波绿波", 318: "蓝波蓝波", 319: "红波红波", 320: "绿波绿波",
+        321: "蓝波蓝波", 322: "绿波绿波", 323: "蓝波蓝波", 324: "绿波绿波", 325: "红波红波", 326: "绿波绿波", 327: "蓝波蓝波", 328: "绿波绿波", 329: "红波红波", 330: "蓝波蓝波",
+        331: "红波红波", 332: "蓝波蓝波", 333: "红波红波", 334: "蓝波蓝波", 335: "红波红波", 336: "蓝波蓝波", 337: "红波红波", 338: "蓝波蓝波", 339: "红波红波", 340: "绿波绿波",
+        341: "蓝波蓝波", 342: "红波红波", 343: "蓝波蓝波", 344: "绿波绿波", 345: "红波红波", 346: "绿波绿波", 347: "蓝波蓝波", 348: "绿波绿波", 349: "蓝波蓝波", 350: "绿波绿波",
+        351: "蓝波蓝波", 352: "绿波绿波", 353: "红波红波", 354: "绿波绿波", 355: "红波红波", 356: "蓝波蓝波", 357: "绿波绿波", 358: "蓝波蓝波", 359: "绿波绿波", 360: "红波红波",
+        361: "绿波绿波", 362: "蓝波蓝波", 363: "红波红波", 364: "绿波绿波", 365: "绿波绿波", 366: "蓝波蓝波"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error(" ");
+            });
+    }
+
+    function getPredictBoForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        return STATIC_PREDICTIONS[actualKy] || "蓝波蓝波";
+    }
+
+    function formatTwoDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalB = (r.c[1] && r.c[1].v !== null && r.c[1].v !== undefined) ? String(r.c[1].v).trim() : '';
+                        let animalE = (r.c[4] && r.c[4].v !== null && r.c[4].v !== undefined) ? String(r.c[4].v).trim() : '';
+                        
+                        if (formattedNum) {
+                            if (animalB) duLieuMapB[formattedNum] = animalB;
+                            if (animalE) duLieuMapE[formattedNum] = animalE;
+                        }
+                    }
+                });
+            }
+
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rows = rawKQ.table.rows;
+            let parsedList = [];
+            let lastXRowIndex = -1;
+
+            if (rows) {
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i].c;
+                    if (!r) continue;
+
+                    let isXRow = false;
+                    for (let colIdx = 1; colIdx <= 7; colIdx++) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            if (String(r[colIdx].v).trim().toLowerCase() === 'x') {
+                                isXRow = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isXRow) {
+                        lastXRowIndex = i;
+                        continue;
+                    }
+
+                    if (!r[0] || r[0].v === null || r[0].v === undefined) continue;
+
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let numTeFormatted = '';
+                    if (r[7] && r[7].v !== null && r[7].v !== undefined) {
+                        let valStr = String(r[7].v).trim();
+                        if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                            numTeFormatted = formatTwoDigits(r[7].v);
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            rowIndex: i,
+                            kyNum: kyOnlyNum,
+                            numTe: numTeFormatted
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.numTe !== '';
+                if (isDone) {
+                    item.useMapE = (lastXRowIndex !== -1 && item.rowIndex > lastXRowIndex);
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let evaluatedDoneList = [];
+            for (let i = 0; i < doneList.length; i++) {
+                let item = doneList[i];
+                let predictedBo = getPredictBoForKy(item.kyNum);
+                
+                let targetMap = item.useMapE ? duLieuMapE : duLieuMapB;
+                let actualAnimal = targetMap[item.numTe] || '';
+                
+                let numVal = parseInt(item.numTe, 10);
+                let isValidRange = (!isNaN(numVal) && numVal >= 1 && numVal <= 49);
+                
+                let killNumbers = COLOR_MAP[predictedBo] || [];
+                let isWin = isValidRange && (!killNumbers.includes(item.numTe));
+
+                evaluatedDoneList.push({ item, isWin, actualAnimal });
+            }
+
+            let checkLatestDeletes = 0;
+            for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                if (!evaluatedDoneList[i].isWin) {
+                    checkLatestDeletes++;
+                } else {
+                    break;
+                }
+            }
+
+            let cutoffIndex = 0;
+            if (checkLatestDeletes >= 3) {
+                cutoffIndex = evaluatedDoneList.length;
+            } else {
+                let consecutiveDeletes = 0;
+                for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                    if (!evaluatedDoneList[i].isWin) {
+                        consecutiveDeletes++;
+                        if (consecutiveDeletes >= 3) {
+                            cutoffIndex = i + 1;
+                            break;
+                        }
+                    } else {
+                        consecutiveDeletes = 0;
+                    }
+                }
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictBoForKy(nextKyNum);
+            let kyStrNext = String(nextKyNum).padStart(3, '0');
+
+            let htmlNextKy = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrNext}期:绝杀一波中特【${predictNext}】开:<span style="color: #FF0000">？00</span>中</p>`;
+
+            let historyOutputs = [];
+            if (checkLatestDeletes < 3) {
+                for (let i = cutoffIndex; i < doneList.length; i++) {
+                    let item = doneList[i];
+                    let evaluated = evaluatedDoneList.find(e => e.item.kyNum === item.kyNum);
+                    if (evaluated && evaluated.isWin) {
+                        let predicted = getPredictBoForKy(item.kyNum);
+                        let shengXiaoWin = evaluated.actualAnimal || '';
+                        let resStrWin = shengXiaoWin + item.numTe;
+                        let kyStr = String(item.kyNum).padStart(3, '0');
+                        historyOutputs.push(`<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr}期:绝杀一波中特【${predicted}】开:<span style="color: #FF0000">${resStrWin}</span>中</p>`);
+                    }
+                }
+            }
+            historyOutputs.reverse();
+
+            if (historyOutputs.length > 14) {
+                historyOutputs = historyOutputs.slice(0, 14);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = String(nextKyNum + 1).padStart(3, '0');
+                let kyStr2 = String(nextKyNum + 2).padStart(3, '0');
+                let defaultHtml1 = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr1}期:绝杀一波中特【發發發發】开:<span style="color: #FF0000">？00</span>中</p>`;
+                let defaultHtml2 = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr2}期:绝杀一波中特【發發發發】开:<span style="color: #FF0000">？00</span>中</p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = String(nextKyNum + 1).padStart(3, '0');
+                let defaultHtmlExtra = `<p style="font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrExtra}期:绝杀一波中特【發發發發】开:<span style="color: #FF0000">？00</span>中</p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = ' ';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>

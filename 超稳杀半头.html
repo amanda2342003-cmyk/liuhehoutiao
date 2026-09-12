@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳门六合彩【绝杀半头】精准猛料！</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content-container" class="content"></div>
+
+<script>
+    const SPREADSHEET_ID = '19wtMwveTJ_eW09pp7ANQj1NkLNbHIA4kWLsoNAk5Xd8';
+    const SHEET_NAME_KQ = 'KQ_XIANGGANG';
+    const SHEET_NAME_DULIEU = 'DULIEU';
+
+    const URL_KQ = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_KQ}`;
+    const URL_DULIEU = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME_DULIEU}`;
+
+    let duLieuMapB = {};
+    let duLieuMapE = {};
+
+    const STATIC_PREDICTIONS = {
+        1: "0头单", 2: "3头双", 3: "2头双", 4: "0头双", 5: "0头单", 6: "3头单", 7: "3头双", 8: "1头双", 9: "4头双", 10: "1头单",
+        11: "4头单", 12: "0头单", 13: "1头双", 14: "2头双", 15: "3头单", 16: "1头单", 17: "1头双", 18: "3头单", 19: "3头双", 20: "2头双",
+        21: "3头单", 22: "0头单", 23: "2头双", 24: "1头单", 25: "3头单", 26: "1头双", 27: "4头双", 28: "0头双", 29: "2头双", 30: "2头单",
+        31: "3头双", 32: "3头单", 33: "4头单", 34: "2头单", 35: "1头单", 36: "3头单", 37: "4头单", 38: "3头双", 39: "0头双", 40: "4头单",
+        41: "1头双", 42: "2头单", 43: "2头双", 44: "1头双", 45: "3头单", 46: "3头双", 47: "4头双", 48: "0头双", 49: "1头双", 50: "3头双",
+        51: "3头单", 52: "0头单", 53: "3头双", 54: "4头单", 55: "2头双", 56: "0头单", 57: "1头双", 58: "3头双", 59: "4头单", 60: "1头单",
+        61: "4头双", 62: "1头双", 63: "4头单", 64: "2头单", 65: "3头单", 66: "4头双", 67: "3头双", 68: "1头双", 69: "2头单", 70: "3头单",
+        71: "0头双", 72: "1头单", 73: "4头双", 74: "0头单", 75: "2头双", 76: "1头单", 77: "0头单", 78: "2头双", 79: "1头单", 80: "1头双",
+        81: "0头双", 82: "2头单", 83: "0头单", 84: "2头双", 85: "1头单", 86: "2头单", 87: "0头单", 88: "1头双", 89: "4头双", 90: "3头单",
+        91: "3头双", 92: "4头单", 93: "2头双", 94: "0头双", 95: "3头双", 96: "2头双", 97: "3头单", 98: "3头双", 99: "0头双", 100: "3头单",
+        101: "0头单", 102: "3头双", 103: "2头双", 104: "0头双", 105: "0头单", 106: "3头单", 107: "3头双", 108: "1头双", 109: "4头双", 110: "1头单",
+        111: "4头单", 112: "0头单", 113: "1头双", 114: "2头双", 115: "3头单", 116: "1头单", 117: "1头双", 118: "3头单", 119: "3头双", 120: "2头双",
+        121: "3头单", 122: "0头单", 123: "2头双", 124: "1头单", 125: "3头单", 126: "1头双", 127: "4头双", 128: "0头双", 129: "2头双", 130: "2头单",
+        131: "3头双", 132: "3头单", 133: "4头单", 134: "2头单", 135: "1头单", 136: "3头单", 137: "4头单", 138: "3头双", 139: "0头双", 140: "4头单",
+        141: "1头双", 142: "2头单", 143: "2头双", 144: "1头双", 145: "3头单", 146: "3头双", 147: "4头双", 148: "0头双", 149: "1头双", 150: "3头双",
+        151: "3头单", 152: "0头单", 153: "3头双", 154: "4头单", 155: "2头双", 156: "0头单", 157: "1头双", 158: "3头双", 159: "4头单", 160: "1头单",
+        161: "4头双", 162: "1头双", 163: "4头单", 164: "2头单", 165: "3头单", 166: "4头双", 167: "3头双", 168: "1头双", 169: "2头单", 170: "3头单",
+        171: "0头双", 172: "1头单", 173: "4头双", 174: "0头单", 175: "2头双", 176: "1头单", 177: "0头单", 178: "2头双", 179: "1头单", 180: "1头双",
+        181: "0头双", 182: "2头单", 183: "0头单", 184: "2头双", 185: "1头单", 186: "2头单", 187: "0头单", 188: "1头双", 189: "4头双", 190: "3头单",
+        191: "3头双", 192: "4头单", 193: "2头双", 194: "0头双", 195: "3头双", 196: "2头双", 197: "3头单", 198: "3头双", 199: "0头双", 200: "3头单",
+        201: "0头单", 202: "3头双", 203: "2头双", 204: "0头双", 205: "0头单", 206: "3头单", 207: "3头双", 208: "1头双", 209: "4头双", 210: "1头单",
+        211: "4头单", 212: "0头单", 213: "1头双", 214: "2头双", 215: "3头单", 216: "1头单", 217: "1头双", 218: "3头单", 219: "3头双", 220: "2头双",
+        221: "3头单", 222: "0头单", 223: "2头双", 224: "1头单", 225: "3头单", 226: "1头双", 227: "4头双", 228: "0头双", 229: "2头双", 230: "2头单",
+        231: "3头双", 232: "3头单", 233: "4头单", 234: "2头单", 235: "1头单", 236: "3头单", 237: "4头单", 238: "3头双", 239: "0头双", 240: "4头单",
+        241: "1头双", 242: "2头单", 243: "2头双", 244: "1头双", 245: "3头单", 246: "3头双", 247: "4头双", 248: "0头双", 249: "1头双", 250: "3头双",
+        251: "3头单", 252: "0头单", 253: "3头双", 254: "4头单", 255: "2头双", 256: "0头单", 257: "1头双", 258: "3头双", 259: "4头单", 260: "1头单",
+        261: "4头双", 262: "1头双", 263: "4头单", 264: "2头单", 265: "3头单", 266: "4头双", 267: "3头双", 268: "1头双", 269: "2头单", 270: "3头单",
+        271: "0头双", 272: "1头单", 273: "4头双", 274: "0头单", 275: "2头双", 276: "1头单", 277: "0头单", 278: "2头双", 279: "1头单", 280: "1头双",
+        281: "0头双", 282: "2头单", 283: "0头单", 284: "2头双", 285: "1头单", 286: "2头单", 287: "0头单", 288: "1头双", 289: "4头双", 290: "3头单",
+        291: "3头双", 292: "4头单", 293: "2头双", 294: "0头双", 295: "3头双", 296: "2头双", 297: "3头单", 298: "3头双", 299: "0头双", 300: "3头单",
+        301: "0头单", 302: "3头双", 303: "2头双", 304: "0头双", 305: "0头单", 306: "3头单", 307: "3头双", 308: "1头双", 309: "4头双", 310: "1头单",
+        311: "4头单", 312: "0头单", 313: "1头双", 314: "2头双", 315: "3头单", 316: "1头单", 317: "1头双", 318: "3头单", 319: "3头双", 320: "2头双",
+        321: "3头单", 322: "0头单", 323: "2头双", 324: "1头单", 325: "3头单", 326: "1头双", 327: "4头双", 328: "0头双", 329: "2头双", 330: "2头单",
+        331: "3头双", 332: "3头单", 333: "4头单", 334: "2头单", 335: "1头单", 336: "3头单", 337: "4头单", 338: "3头双", 339: "0头双", 340: "4头单",
+        341: "1头双", 342: "2头单", 343: "2头双", 344: "1头双", 345: "3头单", 346: "3头双", 347: "4头双", 348: "0头双", 349: "1头双", 350: "3头双",
+        351: "3头单", 352: "0头单", 353: "3头双", 354: "4头单", 355: "2头双", 356: "0头单", 357: "1头双", 358: "3头双", 359: "4头单", 360: "1头单",
+        361: "4头双", 362: "1头双", 363: "4头单", 364: "2头单", 365: "3头单", 366: "4头双"
+    };
+
+    function fetchJSONP(url) {
+        return fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+                if (match && match[1]) return JSON.parse(match[1]);
+                throw new Error(" ");
+            });
+    }
+
+    function getPredictForKy(kyNum) {
+        let actualKy = ((kyNum - 1) % 366) + 1;
+        return STATIC_PREDICTIONS[actualKy] || "0头单";
+    }
+
+    function formatTwoDigits(val) {
+        let num = parseInt(String(val).replace(/\D/g, ''), 10);
+        if (isNaN(num)) return '';
+        return String(num).padStart(2, '0');
+    }
+
+    async function initPredict() {
+        try {
+            const rawRules = await fetchJSONP(URL_DULIEU);
+            if (rawRules.table && rawRules.table.rows) {
+                rawRules.table.rows.forEach(r => {
+                    if (r.c && r.c[0] && r.c[0].v !== null && r.c[0].v !== undefined) {
+                        let formattedNum = formatTwoDigits(r.c[0].v);
+                        let animalB = (r.c[1] && r.c[1].v !== null && r.c[1].v !== undefined) ? String(r.c[1].v).trim() : '';
+                        let animalE = (r.c[4] && r.c[4].v !== null && r.c[4].v !== undefined) ? String(r.c[4].v).trim() : '';
+                        
+                        if (formattedNum) {
+                            if (animalB) duLieuMapB[formattedNum] = animalB;
+                            if (animalE) duLieuMapE[formattedNum] = animalE;
+                        }
+                    }
+                });
+            }
+
+            const rawKQ = await fetchJSONP(URL_KQ);
+            const rows = rawKQ.table.rows;
+            let parsedList = [];
+            let lastXRowIndex = -1;
+
+            if (rows) {
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i].c;
+                    if (!r) continue;
+
+                    let isXRow = false;
+                    for (let colIdx = 1; colIdx <= 7; colIdx++) {
+                        if (r[colIdx] && r[colIdx].v !== null && r[colIdx].v !== undefined) {
+                            if (String(r[colIdx].v).trim().toLowerCase() === 'x') {
+                                isXRow = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isXRow) {
+                        lastXRowIndex = i;
+                        continue;
+                    }
+
+                    if (!r[0] || r[0].v === null || r[0].v === undefined) continue;
+
+                    let kyRaw = String(r[0].v).trim();
+                    let kyOnlyNum = parseInt(kyRaw.replace(/\D/g, ''), 10) || 0;
+                    
+                    let numTeFormatted = '';
+                    if (r[7] && r[7].v !== null && r[7].v !== undefined) {
+                        let valStr = String(r[7].v).trim();
+                        if (valStr !== '' && valStr !== '0' && valStr !== '00') {
+                            numTeFormatted = formatTwoDigits(r[7].v);
+                        }
+                    }
+
+                    if (kyOnlyNum > 0) {
+                        parsedList.push({
+                            rowIndex: i,
+                            kyNum: kyOnlyNum,
+                            numTe: numTeFormatted
+                        });
+                    }
+                }
+            }
+
+            let doneList = [];
+            let pendingKyObj = null;
+
+            for (let i = 0; i < parsedList.length; i++) {
+                let item = parsedList[i];
+                let isDone = item.numTe !== '';
+                if (isDone) {
+                    item.useMapE = (lastXRowIndex !== -1 && item.rowIndex > lastXRowIndex);
+                    doneList.push(item);
+                } else {
+                    pendingKyObj = item;
+                }
+            }
+
+            let targetPredictKy = 1;
+            if (pendingKyObj) {
+                targetPredictKy = pendingKyObj.kyNum;
+            } else if (doneList.length > 0) {
+                targetPredictKy = doneList[doneList.length - 1].kyNum + 1;
+            }
+
+            let evaluatedDoneList = [];
+            for (let i = 0; i < doneList.length; i++) {
+                let item = doneList[i];
+                let predicted = getPredictForKy(item.kyNum);
+                
+                let targetMap = item.useMapE ? duLieuMapE : duLieuMapB;
+                let actualAnimal = targetMap[item.numTe] || '';
+                
+                let numVal = parseInt(item.numTe, 10);
+                let isValidNum = !isNaN(numVal) && numVal >= 1 && numVal <= 49;
+                
+                let actualHead = isValidNum ? item.numTe.charAt(0) : '';
+                let actualDanShuang = isValidNum ? (numVal % 2 !== 0 ? '单' : '双') : '';
+                let actualBanTou = isValidNum ? (actualHead + "头" + actualDanShuang) : '';
+                
+                let isWin = isValidNum && actualAnimal && (actualBanTou !== predicted);
+
+                evaluatedDoneList.push({ item, isWin, actualAnimal });
+            }
+
+            let checkLatestDeletes = 0;
+            for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                if (!evaluatedDoneList[i].isWin) {
+                    checkLatestDeletes++;
+                } else {
+                    break;
+                }
+            }
+
+            let cutoffIndex = 0;
+            if (checkLatestDeletes >= 3) {
+                cutoffIndex = evaluatedDoneList.length;
+            } else {
+                let consecutiveDeletes = 0;
+                for (let i = evaluatedDoneList.length - 1; i >= 0; i--) {
+                    if (!evaluatedDoneList[i].isWin) {
+                        consecutiveDeletes++;
+                        if (consecutiveDeletes >= 3) {
+                            cutoffIndex = i + 1;
+                            break;
+                        }
+                    } else {
+                        consecutiveDeletes = 0;
+                    }
+                }
+            }
+
+            let nextKyNum = targetPredictKy;
+            let predictNext = getPredictForKy(nextKyNum);
+            let kyStrNext = String(nextKyNum).padStart(3, '0');
+
+            let htmlNextKy = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrNext}期：绝杀半头<span style="color:#0000FF;">∝╬══→〖${predictNext}〗</span>【开：<span style="color: #FF0000">？00</span>】准</p>`;
+
+            let historyOutputs = [];
+            if (checkLatestDeletes < 3) {
+                for (let i = cutoffIndex; i < doneList.length; i++) {
+                    let item = doneList[i];
+                    let evaluated = evaluatedDoneList.find(e => e.item.kyNum === item.kyNum);
+                    if (evaluated && evaluated.isWin) {
+                        let predicted = getPredictForKy(item.kyNum);
+                        let shengXiaoWin = evaluated.actualAnimal || '';
+                        let resStrWin = shengXiaoWin + item.numTe;
+                        let kyStr = String(item.kyNum).padStart(3, '0');
+                        historyOutputs.push(`<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr}期：绝杀半头<span style="color:#0000FF;">∝╬══→〖${predicted}〗</span>【开：<span style="color: #FF0000">${resStrWin}</span>】准</p>`);
+                    }
+                }
+            }
+            historyOutputs.reverse();
+
+            if (historyOutputs.length > 14) {
+                historyOutputs = historyOutputs.slice(0, 14);
+            }
+
+            let finalOutputs = [htmlNextKy, ...historyOutputs];
+
+            let currentCount = finalOutputs.length;
+            if (currentCount === 1) {
+                let kyStr1 = String(nextKyNum + 1).padStart(3, '0');
+                let kyStr2 = String(nextKyNum + 2).padStart(3, '0');
+                let defaultHtml1 = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr1}期：绝杀半头<span style="color:#0000FF;">∝╬══→〖$头發〗</span>【开：<span style="color: #FF0000">？00</span>】准</p>`;
+                let defaultHtml2 = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStr2}期：绝杀半头<span style="color:#0000FF;">∝╬══→〖$头發〗</span>【开：<span style="color: #FF0000">？00</span>】准</p>`;
+                finalOutputs.unshift(defaultHtml1);
+                finalOutputs.unshift(defaultHtml2);
+            } else if (currentCount === 2) {
+                let kyStrExtra = String(nextKyNum + 1).padStart(3, '0');
+                let defaultHtmlExtra = `<p style="font-family:微软雅黑;font-size:16px;line-height:25px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${kyStrExtra}期：绝杀半头<span style="color:#0000FF;">∝╬══→〖$头發〗</span>【开：<span style="color: #FF0000">？00</span>】准</p>`;
+                finalOutputs.unshift(defaultHtmlExtra);
+            }
+
+            document.getElementById('content-container').innerHTML = finalOutputs.join('');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('content-container').innerHTML = '';
+        }
+    }
+    initPredict();
+</script>
+
+</body>
+</html>
